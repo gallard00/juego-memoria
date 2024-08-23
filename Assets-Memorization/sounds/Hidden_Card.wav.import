@@ -1,0 +1,23 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/Hidden_Card.wav-de25ccf597eb162cb7f0aa442598a9b5.sample"
+
+[deps]
+
+source_file="res://Assets-Memorization/sounds/Hidden_Card.wav"
+dest_files=[ "res://.import/Hidden_Card.wav-de25ccf597eb162cb7f0aa442598a9b5.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0
