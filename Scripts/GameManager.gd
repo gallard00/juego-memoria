@@ -20,6 +20,7 @@ var flipTimer = Timer.new()
 var score = 0
 
 func _ready():
+	randomize()
 	fillDeck()
 	dealDeck()
 	setupTimers()
@@ -59,6 +60,7 @@ func fillDeck():
 	pass
 #Se encarga de agregar las cartas dentro del grid
 func dealDeck():
+	deck.shuffle() #shuffle() sirve para desordenar el arreglo de cartas
 	#Game.get_node('Grid').add_child(deck[0])
 	#Por medio del ciclo for vamos a estar recorriendo todo el arreglo incluyendo las 52 cartas
 	#Por ese motivo usamos deck.size() para considerar todo el contenido del arreglo 

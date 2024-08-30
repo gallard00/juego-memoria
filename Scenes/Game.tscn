@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scripts/Game.gd" type="Script" id=1]
+[ext_resource path="res://HUD.tscn" type="PackedScene" id=2]
 
 [node name="Game" type="Control"]
 anchor_right = 1.0
@@ -20,3 +21,5 @@ margin_top = 240.0
 margin_right = -40.0
 margin_bottom = -40.0
 columns = 13
+
+[node name="HUD" parent="." instance=ExtResource( 2 )]
