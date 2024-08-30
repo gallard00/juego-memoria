@@ -15,15 +15,53 @@ var card2
 
 var matchTimer = Timer.new()
 var flipTimer = Timer.new()
+var secondsTimer = Timer.new()
 
 #Variable encargadad de la puntuacion
 var score = 0
+#Variable encargada de los segundos transcurridos en el juego
+var seconds = 0
+#Variable encargadad de contabilizar los movimientos del jugador
+var moves = 0
+
+var scoreLabel
+var timerLabel
+var movesLabel
+
+var goal = 26 # cambiar a 26
+
+var splashScreen = preload('res://Scenes/SplashScreen.tscn')
+
+var resetButton
+
+var sound_flipped_card = preload("res://Assets-Memorization/sounds/Flipped_Card.wav")
+var sound_hidden_card = preload("res://Assets-Memorization/sounds/Hidden_Card.wav")
+var sound_score_increase = preload("res://Assets-Memorization/sounds/Score_Increase.wav")
+
+var audiosp = AudioStreamPlayer.new()
 
 func _ready():
 	randomize()
 	fillDeck()
 	dealDeck()
 	setupTimers()
+	setuoHUD()
+	
+	var splashS = splashScreen.instance()
+	Game.add_child(splashS)
+	Game.add_child(audiosp)
+	pass
+
+func setuoHUD():
+	scoreLabel = Game.get_node('HUD/Panel/Sections/SectionScore/Score')
+	timerLabel = Game.get_node('HUD/Panel/Sections/SectionTimer/Seconds')
+	movesLabel = Game.get_node('HUD/Panel/Sections/SectionMoves/Moves')
+	scoreLabel.text = str(score)
+	timerLabel.text = str(seconds)
+	movesLabel.text = str(moves)
+	
+	resetButton = Game.get_node('HUD/Panel/Sections/SectionButtons/ResetButton')
+	resetButton.connect("pressed", self, "resetGame")
 	pass
 
 #Cuando las cartas no tienen el mismo numero conectamos la señal
@@ -38,6 +76,10 @@ func setupTimers():
 	matchTimer.connect("timeout", self, "matchCardsAndScore")
 	matchTimer.set_one_shot(true)
 	add_child(matchTimer)
+	
+	secondsTimer.connect("timeout", self, "countSeconds")
+	add_child(secondsTimer)
+	secondsTimer.start()
 	pass
 #Definimos una funcion que se encarga de crear el mazo
 func fillDeck():
@@ -78,11 +120,17 @@ func chooseCard(var c):
 	if card1 == null:
 		card1 = c
 		card1.flip()
+		audiosp.stream = sound_flipped_card #Definimos el audio correspondiente
+		audiosp.volume_db = -5 #Bajamos el volumen
+		audiosp.play() #Reproducimos el audio
 		card1.set_disabled(true)
 	elif card2 == null:
 		card2 = c
 		card2.flip()
+		audiosp.play()
 		card2.set_disabled(true)
+		moves += 1
+		movesLabel.text = str(moves)
 		checkCards()
 	pass
 
@@ -102,10 +150,19 @@ func checkCards():
 
 func matchCardsAndScore():
 	score += 1
+	scoreLabel.text = str(score)
 	card1.set_modulate(Color(0.6,0.6,0.6,0.5))
 	card2.set_modulate(Color(0.6,0.6,0.6,0.5))
 	card1 = null
 	card2 = null
+	
+	audiosp.stream = sound_score_increase
+	audiosp.play()
+	
+	if score == goal:
+		var winScreen = splashScreen.instance()
+		Game.add_child(winScreen)
+		winScreen.win()
 	pass
 
 func turnOverCards():
@@ -115,6 +172,27 @@ func turnOverCards():
 	card2.set_disabled(false)
 	card1 = null
 	card2 = null
+	
+	audiosp.stream = sound_hidden_card
+	audiosp.play()
 	pass
 
+func countSeconds():
+	seconds += 1
+	timerLabel.text = str(seconds)
+	pass
+
+func resetGame():
+	for c in range(deck.size()): #Recorremos el arreglo
+		deck[c].queue_free() #Liberamos cada carta del arreglo
+	deck.clear()
+	score = 0
+	seconds = 0
+	moves = 0
+	scoreLabel.text = str(score)
+	timerLabel.text = str(seconds)
+	movesLabel.text = str(moves)
+	fillDeck()
+	dealDeck()
+	pass
 
