@@ -28,7 +28,8 @@ var scoreLabel
 var timerLabel
 var movesLabel
 
-var goal = 26 # cambiar a 26
+#var goal = 26 # cambiar a 26
+var goal = 26  # Número total de pares en modo difícil
 
 var splashScreen = preload('res://Scenes/SplashScreen.tscn')
 
@@ -42,14 +43,19 @@ var audiosp = AudioStreamPlayer.new()
 
 func _ready():
 	randomize()
-	fillDeck()
-	dealDeck()
+	#fillDeck()
+	#dealDeck()
 	setupTimers()
 	setuoHUD()
 	
 	var splashS = splashScreen.instance()
 	Game.add_child(splashS)
 	Game.add_child(audiosp)
+	pass
+
+func startGame(cards_count):
+	goal = cards_count  # Establecemos la meta según el nivel
+	resetGame()  # Reinicia el estado del juego
 	pass
 
 func setuoHUD():
@@ -81,8 +87,19 @@ func setupTimers():
 	add_child(secondsTimer)
 	secondsTimer.start()
 	pass
-#Definimos una funcion que se encarga de crear el mazo
+# Modificar el método fillDeck para adaptarlo a la dificultad
 func fillDeck():
+	deck.clear()  # Aseguramos que se inicie vacío
+	var suits = 4  # Cuatro palos en la baraja
+	var values_per_suit = goal / suits  # Cantidad de cartas por palo, dividida equitativamente
+
+	for s in range(1, suits + 1):
+		for v in range(1, int(values_per_suit) + 1):
+			deck.append(Card.new(s, v))
+	pass
+
+#Definimos una funcion que se encarga de crear el mazo
+#func fillDeck():
 	#deck.append(Card.new(1,1))
 	#Iniciamos las variables Suit y Value en 1 ya que existen 4 palos en que se dividen las cartas en una baraja,
 	#si la variable suit es menor que 5 significa que quedan cartas por definir cada vez que iniciamos el agregado de un nuevo palo
@@ -90,16 +107,16 @@ func fillDeck():
 	#en cada palo existen 13 cartas por lo que por medio de otro while verficamos mientras value sea menor a 14 significa que tenemos que seguir agregando cartas hasta llegar al valor de 13
 	#mediante deck.append vamos a estar agregando cartas dentro del array cuando agregamos una carta le aumentamos el valor de la variable value para asi estar agregando todas las demas cartas pertenecientes al mismo palo
 	#cuando terminamos salimos del bucle while, incrementamos el valor de suite para pasar al siguiente palo para asi volver a repetir esta secuencia de codigo
-	var s = 1
-	var v = 1
+	#var s = 1
+	#var v = 1
 	
-	while s < 5:
-		v = 1
-		while v < 14:
-			deck.append(Card.new(s, v))
-			v = v + 1
-		s += 1
-	pass
+	#while s < 5:
+		#v = 1
+		#while v < 14:
+			#deck.append(Card.new(s, v))
+			#v = v + 1
+		#s += 1
+	#pass
 #Se encarga de agregar las cartas dentro del grid
 func dealDeck():
 	deck.shuffle() #shuffle() sirve para desordenar el arreglo de cartas

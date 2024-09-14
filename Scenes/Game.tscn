@@ -24,12 +24,4 @@ columns = 13
 
 [node name="HUD" parent="." instance=ExtResource( 2 )]
 
-[node name="PauseButton" parent="HUD/Panel/Sections/SectionButtons" index="0"]
-margin_top = 0.0
-margin_bottom = 72.0
-
-[node name="ResetButton" parent="HUD/Panel/Sections/SectionButtons" index="1"]
-margin_top = 76.0
-margin_bottom = 148.0
-
 [editable path="HUD"]

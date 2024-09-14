@@ -37,19 +37,39 @@ anchor_bottom = 1.0
 
 [node name="TextureRect" type="TextureRect" parent="CenterContainer/Panel/VBoxContainer"]
 margin_right = 900.0
-margin_bottom = 500.0
+margin_bottom = 300.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="Button" type="Button" parent="CenterContainer/Panel/VBoxContainer"]
+[node name="easy" type="Button" parent="CenterContainer/Panel/VBoxContainer"]
+margin_top = 304.0
+margin_right = 900.0
+margin_bottom = 400.0
+rect_min_size = Vector2( 0, 96 )
+custom_colors/font_color_hover = Color( 0, 1, 0.603922, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "easy"
+flat = true
+
+[node name="normal" type="Button" parent="CenterContainer/Panel/VBoxContainer"]
+margin_top = 404.0
+margin_right = 900.0
+margin_bottom = 500.0
+rect_min_size = Vector2( 0, 96 )
+custom_colors/font_color_hover = Color( 0, 1, 0.603922, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "normal"
+flat = true
+
+[node name="hard" type="Button" parent="CenterContainer/Panel/VBoxContainer"]
 margin_top = 504.0
 margin_right = 900.0
 margin_bottom = 600.0
 rect_min_size = Vector2( 0, 96 )
 custom_colors/font_color_hover = Color( 0, 1, 0.603922, 1 )
 custom_fonts/font = SubResource( 1 )
-text = "PLAY"
+text = "hard"
 flat = true
