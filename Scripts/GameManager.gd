@@ -1,63 +1,83 @@
 extends Node
 
-#Definimos una variable que contendra la referencia al nodo raiz que contiene la escena Game
+# Definimos una variable que contiene la referencia al nodo raíz que contiene la escena Game
 onready var Game = get_node('/root/Game/')
 
-#Definimos la textura de la parte tracera de la carta
+# Definimos la textura de la parte de atras de la carta
 var cardBack = preload("res://Assets-Memorization/cards/cardBack_blue2.png")
 
-#Definimos una variable de tipo arreglo para contener todas las cartas
+# Arreglo que contendrá todas las cartas
 var deck = Array()
 
-#es para saber las primeras dos cartas que el jugador preciono
+# Variables para almacenar las primeras dos cartas seleccionadas por el jugador
 var card1
 var card2
 
+# Timers para controlar el juego
 var matchTimer = Timer.new()
 var flipTimer = Timer.new()
 var secondsTimer = Timer.new()
 
-#Variable encargadad de la puntuacion
+# Variables para manejar la puntuación, los segundos transcurridos y los movimientos del jugador
 var score = 0
-#Variable encargada de los segundos transcurridos en el juego
 var seconds = 0
-#Variable encargadad de contabilizar los movimientos del jugador
 var moves = 0
 
+# Referencias a las etiquetas de HUD
 var scoreLabel
 var timerLabel
 var movesLabel
 
-#var goal = 26 # cambiar a 26
-var goal = 26  # Número total de pares en modo difícil
+# Meta de cartas a encontrar, según el modo de juego (26 pares para modo difícil)
+var goal_hard
+var goal_normal
+var goal_easy
 
+# Pantalla de victoria
 var splashScreen = preload('res://Scenes/SplashScreen.tscn')
 
+var cards_count = 0  # Cantidad de cartas para la partida
+
+# Botón de reinicio
 var resetButton
 
+# Sonidos del juego
 var sound_flipped_card = preload("res://Assets-Memorization/sounds/Flipped_Card.wav")
 var sound_hidden_card = preload("res://Assets-Memorization/sounds/Hidden_Card.wav")
 var sound_score_increase = preload("res://Assets-Memorization/sounds/Score_Increase.wav")
 
+# Reproductor de sonido
 var audiosp = AudioStreamPlayer.new()
 
+# Función que se llama cuando la escena está lista
 func _ready():
 	randomize()
-	#fillDeck()
-	#dealDeck()
 	setupTimers()
 	setuoHUD()
-	
+
+	# Instanciamos la pantalla de splash y el reproductor de audio
 	var splashS = splashScreen.instance()
 	Game.add_child(splashS)
 	Game.add_child(audiosp)
-	pass
 
-func startGame(cards_count):
-	goal = cards_count  # Establecemos la meta según el nivel
-	resetGame()  # Reinicia el estado del juego
-	pass
+# Inicia el juego con el número de cartas dependiendo de la dificultad seleccionada
+func startGame(selected_cards_count):
+	# Asignamos el número de cartas seleccionadas a la variable global cards_count
+	cards_count = selected_cards_count
 
+	# Dependiendo del número de cartas seleccionadas, asignamos la meta correspondiente al nivel de dificultad
+	if cards_count == 12:  # Nivel fácil
+		goal_easy = 6  # 6 pares (12 cartas)
+	elif cards_count == 26:  # Nivel normal
+		goal_normal = 13  # 13 pares (26 cartas)
+	elif cards_count == 52:  # Nivel difícil
+		goal_hard = 26  # 26 pares (52 cartas)
+	
+	resetGame()  # Reiniciamos el estado del juego
+
+
+
+# Configuración del HUD (puntaje, tiempo, movimientos y botón de reinicio)
 func setuoHUD():
 	scoreLabel = Game.get_node('HUD/Panel/Sections/SectionScore/Score')
 	timerLabel = Game.get_node('HUD/Panel/Sections/SectionTimer/Seconds')
@@ -65,81 +85,53 @@ func setuoHUD():
 	scoreLabel.text = str(score)
 	timerLabel.text = str(seconds)
 	movesLabel.text = str(moves)
-	
+
 	resetButton = Game.get_node('HUD/Panel/Sections/SectionButtons/ResetButton')
 	resetButton.connect("pressed", self, "resetGame")
-	pass
 
-#Cuando las cartas no tienen el mismo numero conectamos la señal
-#Se activa el one shot para que el timer sea ejecutado una sola vez
-#Despues el timer se añade como hijo
-#Mismos pasos para el otro timer
+# Configura los timers y conecta sus señales
 func setupTimers():
 	flipTimer.connect("timeout", self, "turnOverCards")
 	flipTimer.set_one_shot(true)
 	add_child(flipTimer)
-	
+
 	matchTimer.connect("timeout", self, "matchCardsAndScore")
 	matchTimer.set_one_shot(true)
 	add_child(matchTimer)
-	
+
 	secondsTimer.connect("timeout", self, "countSeconds")
 	add_child(secondsTimer)
 	secondsTimer.start()
-	pass
-# Modificar el método fillDeck para adaptarlo a la dificultad
-func fillDeck():
-	deck.clear()  # Aseguramos que se inicie vacío
-	var suits = 4  # Cuatro palos en la baraja
-	var values_per_suit = goal / suits  # Cantidad de cartas por palo, dividida equitativamente
 
+# Llena el mazo de cartas según la dificultad seleccionada
+func fillDeck():
+	deck.clear()  # Limpiamos el mazo
+	var suits = 4  # Cuatro palos (ej: corazones, diamantes, tréboles y picas)
+
+	# Calculamos cuántos valores por palo debemos tener, dependiendo de la cantidad total de cartas
+	var values_per_suit = cards_count / suits  # Se divide la cantidad de cartas por los palos
+
+	# Bucle para generar las cartas según la cantidad de palos y valores
 	for s in range(1, suits + 1):
 		for v in range(1, int(values_per_suit) + 1):
+			# Creamos una nueva carta y la añadimos al mazo
 			deck.append(Card.new(s, v))
-	pass
 
-#Definimos una funcion que se encarga de crear el mazo
-#func fillDeck():
-	#deck.append(Card.new(1,1))
-	#Iniciamos las variables Suit y Value en 1 ya que existen 4 palos en que se dividen las cartas en una baraja,
-	#si la variable suit es menor que 5 significa que quedan cartas por definir cada vez que iniciamos el agregado de un nuevo palo
-	#inicializamos la variable value que representa al valor de la carta empezando desde su valor inicial, es decir 1
-	#en cada palo existen 13 cartas por lo que por medio de otro while verficamos mientras value sea menor a 14 significa que tenemos que seguir agregando cartas hasta llegar al valor de 13
-	#mediante deck.append vamos a estar agregando cartas dentro del array cuando agregamos una carta le aumentamos el valor de la variable value para asi estar agregando todas las demas cartas pertenecientes al mismo palo
-	#cuando terminamos salimos del bucle while, incrementamos el valor de suite para pasar al siguiente palo para asi volver a repetir esta secuencia de codigo
-	#var s = 1
-	#var v = 1
-	
-	#while s < 5:
-		#v = 1
-		#while v < 14:
-			#deck.append(Card.new(s, v))
-			#v = v + 1
-		#s += 1
-	#pass
-#Se encarga de agregar las cartas dentro del grid
+
+# Desordenamos el mazo y lo agregamos al nodo Grid
 func dealDeck():
-	deck.shuffle() #shuffle() sirve para desordenar el arreglo de cartas
-	#Game.get_node('Grid').add_child(deck[0])
-	#Por medio del ciclo for vamos a estar recorriendo todo el arreglo incluyendo las 52 cartas
-	#Por ese motivo usamos deck.size() para considerar todo el contenido del arreglo 
-	for i in deck.size():
-		Game.get_node('Grid').add_child(deck[i])
-	pass
+	deck.shuffle()  # Desordenamos las cartas
+	for i in range(deck.size()):
+		Game.get_node('Grid').add_child(deck[i])  # Agregamos las cartas al Grid
 
-
-#si nuestra variable card1 esta vacia si es cierto el jugador voltea su primera carta
-#hacemos que la variable card1 obtenga la referencia de la carta 1 que el jugador preciono
-#hacemos el volteo de la carta llamando a la funion flip()
-#finalmente llamamos a set_disabled(true) para que la carta cuando sea volteada no pueda volver a voltearse
-#con el elif seguimos con la misma logica
+# Manejamos la selección de cartas por parte del jugador
 func chooseCard(var c):
 	if card1 == null:
 		card1 = c
 		card1.flip()
-		audiosp.stream = sound_flipped_card #Definimos el audio correspondiente
-		audiosp.volume_db = -5 #Bajamos el volumen
-		audiosp.play() #Reproducimos el audio
+		audiosp.stream = sound_flipped_card
+		audiosp.volume_db = -5
+		audiosp.play()
 		card1.set_disabled(true)
 	elif card2 == null:
 		card2 = c
@@ -149,39 +141,33 @@ func chooseCard(var c):
 		moves += 1
 		movesLabel.text = str(moves)
 		checkCards()
-	pass
 
-
-#Comprobamos si las cartas tienen el mismo numero accediendo a su variable value
-#Si es cierto a cada una de las cartas le aplico un cambio de color para diferenciar las cartas que ya acerto
-#Despues hacemos que las variables card1 y 2 queden receteadas para que el jugador pueda volver a legir cartas
-#si es falso hacemos que las cartas vuelvan a darse vuelta con la funcion flip()
-#Llamamos a la funcion set_disabled a false para desactivar la desahbilitacion para que puedan volver a ser elegidas
-#las variables vuelven a su estado inicial para que el jugador vuelva a elegir dos cartas
+# Verificamos si las cartas coinciden en valor
 func checkCards():
 	if card1.value == card2.value:
-		matchTimer.start(1)
+		matchTimer.start(1)  # Temporizador para procesar la coincidencia
 	else:
-		flipTimer.start(1)
-	pass
+		flipTimer.start(1)  # Temporizador para voltear las cartas
 
+# Incrementamos el puntaje y deshabilitamos las cartas coincidentes
 func matchCardsAndScore():
 	score += 1
 	scoreLabel.text = str(score)
-	card1.set_modulate(Color(0.6,0.6,0.6,0.5))
-	card2.set_modulate(Color(0.6,0.6,0.6,0.5))
+	card1.set_modulate(Color(0.6, 0.6, 0.6, 0.5))  # Cambiamos el color de las cartas acertadas
+	card2.set_modulate(Color(0.6, 0.6, 0.6, 0.5))
 	card1 = null
 	card2 = null
-	
+
 	audiosp.stream = sound_score_increase
 	audiosp.play()
-	
-	if score == goal:
+
+	# Si el jugador encuentra todos los pares, mostramos la pantalla de victoria
+	if (score == goal_easy and cards_count == 12) or (score == goal_normal and cards_count == 26) or (score == goal_hard and cards_count == 52):
 		var winScreen = splashScreen.instance()
 		Game.add_child(winScreen)
 		winScreen.win()
-	pass
 
+# Volteamos las cartas si no coincidieron
 func turnOverCards():
 	card1.flip()
 	card2.flip()
@@ -189,19 +175,19 @@ func turnOverCards():
 	card2.set_disabled(false)
 	card1 = null
 	card2 = null
-	
+
 	audiosp.stream = sound_hidden_card
 	audiosp.play()
-	pass
 
+# Contador de segundos
 func countSeconds():
 	seconds += 1
 	timerLabel.text = str(seconds)
-	pass
 
+# Reinicia el juego
 func resetGame():
-	for c in range(deck.size()): #Recorremos el arreglo
-		deck[c].queue_free() #Liberamos cada carta del arreglo
+	for c in range(deck.size()):
+		deck[c].queue_free()  # Liberamos todas las cartas
 	deck.clear()
 	score = 0
 	seconds = 0
@@ -209,7 +195,5 @@ func resetGame():
 	scoreLabel.text = str(score)
 	timerLabel.text = str(seconds)
 	movesLabel.text = str(moves)
-	fillDeck()
-	dealDeck()
-	pass
-
+	fillDeck()  # Llenamos de nuevo el mazo
+	dealDeck()  # Distribuimos las cartas
