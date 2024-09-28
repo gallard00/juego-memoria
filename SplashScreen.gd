@@ -6,7 +6,7 @@ func _ready():
 	
 	# Conectamos cada botón a la función que selecciona la dificultad, pasando el número de pares de cartas
 	$CenterContainer/Panel/VBoxContainer/easy.connect("pressed", self, "_on_difficulty_selected", [12])  # 12 pares para fácil
-	$CenterContainer/Panel/VBoxContainer/normal.connect("pressed", self, "_on_difficulty_selected", [26]) # 26 pares para normal
+	$CenterContainer/Panel/VBoxContainer/normal.connect("pressed", self, "_on_difficulty_selected", [24]) # 26 pares para normal
 	$CenterContainer/Panel/VBoxContainer/hard.connect("pressed", self, "_on_difficulty_selected", [52]) # 52 pares para difícil
 
 

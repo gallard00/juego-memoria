@@ -68,8 +68,8 @@ func startGame(selected_cards_count):
 	# Dependiendo del número de cartas seleccionadas, asignamos la meta correspondiente al nivel de dificultad
 	if cards_count == 12:  # Nivel fácil
 		goal_easy = 6  # 6 pares (12 cartas)
-	elif cards_count == 26:  # Nivel normal
-		goal_normal = 13  # 13 pares (26 cartas)
+	elif cards_count == 24:  # Nivel normal
+		goal_normal = 12  # 13 pares (26 cartas)
 	elif cards_count == 52:  # Nivel difícil
 		goal_hard = 26  # 26 pares (52 cartas)
 	
@@ -162,7 +162,7 @@ func matchCardsAndScore():
 	audiosp.play()
 
 	# Si el jugador encuentra todos los pares, mostramos la pantalla de victoria
-	if (score == goal_easy and cards_count == 12) or (score == goal_normal and cards_count == 26) or (score == goal_hard and cards_count == 52):
+	if (score == goal_easy and cards_count == 12) or (score == goal_normal and cards_count == 24) or (score == goal_hard and cards_count == 52):
 		var winScreen = splashScreen.instance()
 		Game.add_child(winScreen)
 		winScreen.win()
