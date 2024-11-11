@@ -1,12 +1,28 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Scripts/Game.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/HUD.tscn" type="PackedScene" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node
+
+
+# Almacena el nivel actual para que podamos verificar si el jugador está en el mismo nivel
+var current_level
+
+# Cambia de nivel solo si es necesario
+func change_level(selected_level):
+	if current_level != selected_level:
+		current_level = selected_level
+		GameManager.resetGame()  # Reiniciamos el juego para empezar con el nuevo nivel
+		GameManager.startGame(current_level)
+	else:
+		GameManager.resumeGame()  # Simplemente reanuda si el nivel es el mismo
+"
 
 [node name="Game" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource( 1 )
+script = SubResource( 1 )
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchor_right = 1.0

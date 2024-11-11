@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Assets-Memorization/fonts/Nunito-Bold.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://Assets-Memorization/ui/title.jpg" type="Texture" id=2]
-[ext_resource path="res://SplashScreen.gd" type="Script" id=3]
+[ext_resource path="res://Scripts/SplashScreen.gd" type="Script" id=3]
 
 [sub_resource type="DynamicFont" id=1]
 size = 64

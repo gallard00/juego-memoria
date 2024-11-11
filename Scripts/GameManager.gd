@@ -184,10 +184,14 @@ func countSeconds():
 	seconds += 1
 	timerLabel.text = str(seconds)
 
-# Reinicia el juego
+#Gestiona los estados del juego sin reiniciarlo cuando se desea seguir en el mismo nivel.
+func resumeGame():
+	get_tree().set_pause(false)
+
+# Reinicia el juego para el cambio de nivel
 func resetGame():
 	for c in range(deck.size()):
-		deck[c].queue_free()  # Liberamos todas las cartas
+		deck[c].queue_free()  # Libera todas las cartas
 	deck.clear()
 	score = 0
 	seconds = 0
